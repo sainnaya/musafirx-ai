@@ -14,7 +14,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({ itinerary }) => {
   const [isChatting, setIsChatting] = useState(false);
 
   const handleChat = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); 
     if (!chatQuery.trim()) return;
     setIsChatting(true);
     const context = `Trip to ${itinerary.title}. Day ${activeDay} plan: ${JSON.stringify(itinerary.days.find(d => d.day === activeDay))}`;

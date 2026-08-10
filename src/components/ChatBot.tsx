@@ -48,7 +48,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ currentItinerary }) => {
     setInputText("");
     setIsLoading(true);
 
-    const context = currentItinerary 
+    const context = currentItinerary
       ? `Trip to ${currentItinerary.title} (${currentItinerary.days.length} days). Cost: ${currentItinerary.totalEstimatedCost} ${currentItinerary.currency}. Description: ${currentItinerary.description}`
       : "User is currently planning a trip but hasn't generated an itinerary yet.";
 
@@ -82,7 +82,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ currentItinerary }) => {
 
   return (
     <div className={`fixed bottom-6 right-6 z-50 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col transition-all duration-300 ${isExpanded ? 'w-[90vw] h-[80vh] md:w-[600px] md:h-[700px]' : 'w-[90vw] h-[60vh] md:w-[400px] md:h-[500px]'}`}>
-      
+
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 rounded-t-2xl backdrop-blur-sm">
         <div className="flex items-center gap-2">
@@ -92,18 +92,18 @@ export const ChatBot: React.FC<ChatBotProps> = ({ currentItinerary }) => {
           <div>
             <h3 className="font-bold text-slate-800 dark:text-white text-sm">MusafirX Assistant</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Online • Grounded
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Online • Grounded
             </p>
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <button 
+          <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="p-2 text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
           >
             {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
-          <button 
+          <button
             onClick={() => setIsOpen(false)}
             className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors"
           >
@@ -117,16 +117,15 @@ export const ChatBot: React.FC<ChatBotProps> = ({ currentItinerary }) => {
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[85%] space-y-2`}>
-              <div 
-                className={`p-3.5 rounded-2xl text-sm leading-relaxed ${
-                  msg.role === 'user' 
-                    ? 'bg-teal-600 text-white rounded-tr-none shadow-md shadow-teal-900/10' 
+              <div
+                className={`p-3.5 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
+                    ? 'bg-teal-600 text-white rounded-tr-none shadow-md shadow-teal-900/10'
                     : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-100 dark:border-slate-700 rounded-tl-none shadow-sm'
-                }`}
+                  }`}
               >
                 {msg.text}
               </div>
-              
+
               {/* Sources / Grounding Data */}
               {msg.sources && msg.sources.length > 0 && (
                 <div className="flex flex-wrap gap-2 animate-fade-in">
@@ -150,10 +149,10 @@ export const ChatBot: React.FC<ChatBotProps> = ({ currentItinerary }) => {
         ))}
         {isLoading && (
           <div className="flex justify-start">
-             <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-3 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-2 text-xs text-slate-500">
-                <Loader2 className="w-3 h-3 animate-spin text-teal-500" />
-                Thinking & Searching...
-             </div>
+            <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-3 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-2 text-xs text-slate-500">
+              <Loader2 className="w-3 h-3 animate-spin text-teal-500" />
+              Thinking & Searching...
+            </div>
           </div>
         )}
         <div ref={messagesEndRef} />
@@ -178,9 +177,9 @@ export const ChatBot: React.FC<ChatBotProps> = ({ currentItinerary }) => {
           </button>
         </div>
         <div className="mt-2 flex justify-center gap-4 text-[10px] text-slate-400 dark:text-slate-500 font-medium">
-             <span>Powered by Gemini</span>
-             <span>•</span>
-             <span>Real-time Google Search</span>
+          <span>Powered by Gemini</span>
+          <span>•</span>
+          <span>Real-time Google Search</span>
         </div>
       </form>
     </div>
