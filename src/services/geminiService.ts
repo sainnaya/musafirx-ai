@@ -14,8 +14,8 @@ const itinerarySchema: Schema = {
     description: { type: Type.STRING, description: "A brief summary of the experience" },
     totalEstimatedCost: { type: Type.NUMBER, description: "Total estimated cost in USD" },
     currency: { type: Type.STRING, description: "Local currency code" },
-    travelTips: { 
-      type: Type.ARRAY, 
+    travelTips: {
+      type: Type.ARRAY,
       items: { type: Type.STRING },
       description: "3-5 crucial travel tips for this specific location and demographic"
     },
@@ -49,8 +49,8 @@ const itinerarySchema: Schema = {
 
 export const generateItinerary = async (prefs: TripPreferences): Promise<Itinerary> => {
   // Use gemini-3.1-flash-lite for speed and quality
-  const model = "gemini-3.1-flash-lite"; 
-  
+  const model = "gemini-3.1-flash-lite";
+
   const prompt = `
     Create a detailed, day-by-day travel itinerary for a trip to ${prefs.destination}.
     Start Date: ${prefs.startDate || "Anytime"}.
@@ -71,7 +71,7 @@ export const generateItinerary = async (prefs: TripPreferences): Promise<Itinera
     const response = await ai.models.generateContent({
       model: "gemini-3.1-flash-lite",
       contents: prompt,
-       config: {
+      config: {
         responseMimeType: "application/json",
         responseSchema: itinerarySchema,
         temperature: 0.4,
@@ -80,7 +80,7 @@ export const generateItinerary = async (prefs: TripPreferences): Promise<Itinera
 
     const text = response.text;
     if (!text) throw new Error("No response from Gemini");
-    
+
     return JSON.parse(text) as Itinerary;
   } catch (error) {
     console.error("Error generating itinerary:", error);
@@ -89,7 +89,7 @@ export const generateItinerary = async (prefs: TripPreferences): Promise<Itinera
 };
 
 export const askTravelAssistant = async (
-  query: string, 
+  query: string,
   currentContext: string,
   history: ChatMessage[] = []
 ): Promise<{ text: string, sources?: { title: string, uri: string }[] }> => {
@@ -116,15 +116,15 @@ export const askTravelAssistant = async (
     const response = await ai.models.generateContent({
       model: "gemini-3.1-flash-lite",
       contents: prompt,
-    
+
     });
 
     const text = response.text || "I'm having trouble connecting to the travel servers right now.";
-    
+
     // Extract sources from grounding metadata
     const sources: { title: string, uri: string }[] = [];
     const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
-    
+
     if (chunks) {
       chunks.forEach((chunk: any) => {
         if (chunk.web?.uri) {
@@ -144,7 +144,7 @@ export const askTravelAssistant = async (
 };
 
 export const analyzeImageForSocial = async (
-  imageBase64: string, 
+  imageBase64: string,
   additionalContext: string
 ): Promise<{ caption: string; hashtags: string[]; location: string }> => {
   try {
@@ -188,7 +188,7 @@ export const analyzeImageForSocial = async (
   }
 };
 
-export const categorizeExpense = async (description: string, amount: number): Promise<{category: string, subcategory: string}> => {
+export const categorizeExpense = async (description: string, amount: number): Promise<{ category: string, subcategory: string }> => {
   try {
     const prompt = `
       Categorize this expense: "${description}" with amount ${amount}.
@@ -199,7 +199,7 @@ export const categorizeExpense = async (description: string, amount: number): Pr
       Food -> Restaurants, Groceries, Snacks, Drinks.
       Transport -> Flight, Taxi, Train, Bus, Fuel.
     `;
-    
+
     const response = await ai.models.generateContent({
       model: "gemini-3.1-flash-lite",
       contents: prompt,
@@ -222,7 +222,7 @@ export const categorizeExpense = async (description: string, amount: number): Pr
   }
 };
 
-export const resolveDestination = async (query: string): Promise<{name: string, url?: string}> => {
+export const resolveDestination = async (query: string): Promise<{ name: string, url?: string }> => {
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3.1-flash-lite",
@@ -234,7 +234,7 @@ export const resolveDestination = async (query: string): Promise<{name: string, 
         temperature: 0,
       }
     });
-    
+
     const name = response.text?.trim() || query;
     let url: string | undefined;
 
@@ -272,7 +272,7 @@ export const convertCurrency = async (amount: number, from: string, to: string):
         }
       }
     });
-    
+
     const data = JSON.parse(response.text || '{}');
     return data.result || 0;
   } catch (e) {
@@ -346,94 +346,617 @@ Structure required:
   }
 };
 
-export const generateTourGuides = async (location: string): Promise<TourGuide[]> => {
-  const prompt = `
-    Generate 3 fictional, highly realistic local tour guides for ${location}.
-    For each guide, provide:
-    - id: string
-    - name: string (local sounding name)
-    - languages: string[] (relevant languages)
-    - specialty: string (e.g. "Food Tours", "History", "Nightlife")
-    - rating: number (4.5 to 5.0)
-    - ratePerHour: number (in USD)
-    - imageUrl: string (Use "https://picsum.photos/200/200?random=" plus a random number)
-  `;
+export const generateTourGuides = async (
+    location: string
+): Promise<TourGuide[]> => {
+    const prompt = `
+Generate exactly 3 fictional, highly realistic local tour guides for "${location}".
 
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-3.1-flash-lite",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              id: { type: Type.STRING },
-              name: { type: Type.STRING },
-              languages: { type: Type.ARRAY, items: { type: Type.STRING } },
-              specialty: { type: Type.STRING },
-              rating: { type: Type.NUMBER },
-              ratePerHour: { type: Type.NUMBER },
-              imageUrl: { type: Type.STRING }
-            }
-          }
-        }
-      }
-    });
+For each guide provide:
 
-    return JSON.parse(response.text || '[]');
-  } catch (e) {
-    console.error("Guide generation failed", e);
-    return [];
-  }
-};
+- id: string
+- name: string (local-sounding name)
+- languages: string[] (relevant languages spoken in ${location})
+- specialty: string (for example: Food Tours, History, Nightlife, Culture, Photography)
+- rating: number between 4.5 and 5.0
+- ratePerHour: number in USD
+- imageUrl: string using:
+  https://picsum.photos/200/200?random=RANDOM_NUMBER
 
-export const generateCommunityPosts = async (topic: string): Promise<CommunityPost[]> => {
-  const prompt = `
-    Generate 4 realistic social media posts from travelers currently in or discussing ${topic}.
-    Each post should look authentic.
+Make every field mandatory.
+
+Return ONLY valid JSON matching the requested schema.
+`;
+
     
-    Fields required:
-    - id: string
-    - user: string (name)
-    - location: string (specific spot in ${topic})
-    - content: string (the post text, engaging, maybe a question or tip)
-    - likes: number
-    - tags: string[]
-    - imageUrl: string (Use "https://picsum.photos/600/400?random=" plus a random number)
-    - timestamp: number (use Date.now() minus random time)
-  `;
+    // Fallback guides
+    
+    const createFallbackGuides = (): TourGuide[] => {
+        const randomImage = () =>
+            `https://picsum.photos/200/200?random=${Math.floor(
+                Math.random() * 1000
+            )}`;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-3.1-flash-lite",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              id: { type: Type.STRING },
-              user: { type: Type.STRING },
-              location: { type: Type.STRING },
-              content: { type: Type.STRING },
-              likes: { type: Type.NUMBER },
-              tags: { type: Type.ARRAY, items: { type: Type.STRING } },
-              imageUrl: { type: Type.STRING },
-              timestamp: { type: Type.NUMBER }
+        return [
+            {
+                id: `guide-${Date.now()}-1`,
+                name: "Arjun Patel",
+                languages: ["English", "Hindi"],
+                specialty: "Culture & Local Experiences",
+                rating: 4.9,
+                ratePerHour: 35,
+                imageUrl: randomImage()
+            },
+            {
+                id: `guide-${Date.now()}-2`,
+                name: "Maya Sharma",
+                languages: ["English", "Hindi"],
+                specialty: "Food & Street Tours",
+                rating: 4.8,
+                ratePerHour: 30,
+                imageUrl: randomImage()
+            },
+            {
+                id: `guide-${Date.now()}-3`,
+                name: "Kabir Mehta",
+                languages: ["English", "Hindi"],
+                specialty: "History & Photography",
+                rating: 4.9,
+                ratePerHour: 40,
+                imageUrl: randomImage()
+            }
+        ];
+    };
+
+    
+    // Normalize Gemini response
+    
+    const normalizeGuides = (data: any[]): TourGuide[] => {
+        if (!Array.isArray(data)) {
+            return [];
+        }
+
+        return data
+            .map((guide, index) => {
+                const name =
+                    typeof guide?.name === "string" &&
+                    guide.name.trim()
+                        ? guide.name.trim()
+                        : `Local Guide ${index + 1}`;
+
+                const languages = Array.isArray(guide?.languages)
+                    ? guide.languages.filter(
+                          (language: unknown): language is string =>
+                              typeof language === "string" &&
+                              language.trim().length > 0
+                      )
+                    : [];
+
+                const specialty =
+                    typeof guide?.specialty === "string" &&
+                    guide.specialty.trim()
+                        ? guide.specialty.trim()
+                        : "Local Experiences";
+
+                const rating =
+                    typeof guide?.rating === "number" &&
+                    Number.isFinite(guide.rating)
+                        ? Math.min(5, Math.max(4.5, guide.rating))
+                        : 4.8;
+
+                const ratePerHour =
+                    typeof guide?.ratePerHour === "number" &&
+                    Number.isFinite(guide.ratePerHour)
+                        ? Math.max(0, Math.round(guide.ratePerHour))
+                        : 30;
+
+                const imageUrl =
+                    typeof guide?.imageUrl === "string" &&
+                    guide.imageUrl.trim()
+                        ? guide.imageUrl
+                        : `https://picsum.photos/200/200?random=${Math.floor(
+                              Math.random() * 1000
+                          )}`;
+
+                return {
+                    id:
+                        typeof guide?.id === "string" &&
+                        guide.id.trim()
+                            ? guide.id
+                            : `guide-${Date.now()}-${index}`,
+
+                    name,
+
+                    languages:
+                        languages.length > 0
+                            ? languages
+                            : ["English"],
+
+                    specialty,
+
+                    rating,
+
+                    ratePerHour,
+
+                    imageUrl
+                };
+            })
+            .filter((guide) => guide.name.length > 0);
+    };
+
+    
+    // Gemini request with retry
+   
+    const maxRetries = 3;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            console.log(
+                `Generating tour guides for "${location}" - attempt ${attempt}/${maxRetries}`
+            );
+
+            const response = await ai.models.generateContent({
+                model: "gemini-3.1-flash-lite",
+
+                contents: prompt,
+
+                config: {
+                    responseMimeType: "application/json",
+
+                    responseSchema: {
+                        type: Type.ARRAY,
+
+                        items: {
+                            type: Type.OBJECT,
+
+                            properties: {
+                                id: {
+                                    type: Type.STRING
+                                },
+
+                                name: {
+                                    type: Type.STRING
+                                },
+
+                                languages: {
+                                    type: Type.ARRAY,
+                                    items: {
+                                        type: Type.STRING
+                                    }
+                                },
+
+                                specialty: {
+                                    type: Type.STRING
+                                },
+
+                                rating: {
+                                    type: Type.NUMBER
+                                },
+
+                                ratePerHour: {
+                                    type: Type.NUMBER
+                                },
+
+                                imageUrl: {
+                                    type: Type.STRING
+                                }
+                            },
+
+                            required: [
+                                "id",
+                                "name",
+                                "languages",
+                                "specialty",
+                                "rating",
+                                "ratePerHour",
+                                "imageUrl"
+                            ]
+                        }
+                    }
+                }
+            });
+
+            const rawText = response.text?.trim();
+
+            if (!rawText) {
+                throw new Error("Gemini returned an empty response");
+            }
+
+            let parsedData: unknown;
+
+            try {
+                parsedData = JSON.parse(rawText);
+            } catch (parseError) {
+                console.error(
+                    "Failed to parse Gemini guide response:",
+                    parseError
+                );
+
+                throw new Error("Gemini returned invalid JSON");
+            }
+
+            const normalizedGuides = normalizeGuides(
+                Array.isArray(parsedData) ? parsedData : []
+            );
+
+            if (normalizedGuides.length > 0) {
+                console.log(
+                    `Successfully generated ${normalizedGuides.length} tour guides`
+                );
+
+                return normalizedGuides;
+            }
+
+            throw new Error("Gemini returned no valid guides");
+        } catch (error: any) {
+            const errorMessage =
+                error?.message || String(error);
+
+            console.error(
+                `Guide generation attempt ${attempt} failed:`,
+                error
+            );
+
+            // Temporary Gemini errors
+            const isTemporaryError =
+                errorMessage.includes("503") ||
+                errorMessage.includes("UNAVAILABLE") ||
+                errorMessage.includes("high demand") ||
+                errorMessage.includes("overloaded") ||
+                errorMessage.includes("temporarily");
+
+            // Don't retry errors that aren't temporary
+            if (!isTemporaryError) {
+                console.error(
+                    "Non-retryable Gemini error. Using fallback guides."
+                );
+
+                return createFallbackGuides();
+            }
+
+            // Retry if attempts remain
+            if (attempt < maxRetries) {
+                const delay = attempt * 2000;
+
+                console.log(
+                    `Gemini temporarily unavailable. Retrying in ${
+                        delay / 1000
+                    } seconds...`
+                );
+
+                await new Promise((resolve) =>
+                    setTimeout(resolve, delay)
+                );
+            }
+        }
+    }
+
+    
+    // Final fallback
+    
+    console.warn(
+        `Gemini unavailable after ${maxRetries} attempts. Using fallback guides.`
+    );
+
+    return createFallbackGuides();
+};
+
+
+
+export const generateCommunityPosts = async (
+  topic: string
+): Promise<CommunityPost[]> => {
+  const prompt = `
+Generate exactly 4 realistic social media posts from travelers currently in or discussing "${topic}".
+
+Each post should look authentic, natural, and useful to other travelers.
+
+Return ONLY valid JSON matching the requested schema.
+
+Rules:
+- user must always be a realistic traveler name
+- location must be a specific place or area related to ${topic}
+- content should be engaging and useful, such as a travel tip, experience, recommendation, or question
+- likes must be a realistic number between 5 and 500
+- tags must contain 1-4 relevant hashtags
+- imageUrl must use this format:
+  https://picsum.photos/600/400?random=RANDOM_NUMBER
+- timestamp must be a Unix timestamp in milliseconds
+`;
+
+  // ---------------------------------------------------------
+  // Fallback posts
+  // ---------------------------------------------------------
+  const createFallbackPosts = (): CommunityPost[] => {
+    const now = Date.now();
+
+    return [
+      {
+        id: `fallback-${now}-1`,
+        user: "Aarav Mehta",
+        location: `${topic}`,
+        content: `Just exploring ${topic} and loving the experience so far! Does anyone have a hidden gem or local spot they would recommend?`,
+        likes: 42,
+        tags: ["#Travel", "#Explore"],
+        imageUrl: `https://picsum.photos/600/400?random=${Math.floor(
+          Math.random() * 1000
+        )}`,
+        timestamp: now - 1000 * 60 * 35
+      },
+      {
+        id: `fallback-${now}-2`,
+        user: "Maya Sharma",
+        location: `${topic}`,
+        content: `Quick travel tip: give yourself some free time instead of planning every minute. Some of my best memories came from randomly discovering places along the way.`,
+        likes: 87,
+        tags: ["#TravelTips", "#Wanderlust"],
+        imageUrl: `https://picsum.photos/600/400?random=${Math.floor(
+          Math.random() * 1000
+        )}`,
+        timestamp: now - 1000 * 60 * 90
+      },
+      {
+        id: `fallback-${now}-3`,
+        user: "Kabir Patel",
+        location: `${topic}`,
+        content: `Has anyone visited ${topic} recently? I'm planning a trip and would love recommendations for food, photography spots, and things that are worth experiencing.`,
+        likes: 64,
+        tags: ["#TripPlanning", "#TravelCommunity"],
+        imageUrl: `https://picsum.photos/600/400?random=${Math.floor(
+          Math.random() * 1000
+        )}`,
+        timestamp: now - 1000 * 60 * 180
+      },
+      {
+        id: `fallback-${now}-4`,
+        user: "Riya Kapoor",
+        location: `${topic}`,
+        content: `One thing I have learned while traveling: don't be afraid to talk to locals. They often know the best places that never show up on the usual tourist lists.`,
+        likes: 123,
+        tags: ["#LocalTips", "#SoloTravel"],
+        imageUrl: `https://picsum.photos/600/400?random=${Math.floor(
+          Math.random() * 1000
+        )}`,
+        timestamp: now - 1000 * 60 * 300
+      }
+    ];
+  };
+
+  // ---------------------------------------------------------
+  // Validate and normalize Gemini response
+  // ---------------------------------------------------------
+  const normalizePosts = (data: any[]): CommunityPost[] => {
+    if (!Array.isArray(data)) {
+      return [];
+    }
+
+    return data
+      .map((post, index) => {
+        const username =
+          typeof post?.user === "string" && post.user.trim()
+            ? post.user.trim()
+            : `Traveler ${index + 1}`;
+
+        const location =
+          typeof post?.location === "string" &&
+            post.location.trim()
+            ? post.location.trim()
+            : topic;
+
+        const content =
+          typeof post?.content === "string" &&
+            post.content.trim()
+            ? post.content.trim()
+            : `Sharing my experience traveling around ${topic}.`;
+
+        const likes =
+          typeof post?.likes === "number" && post.likes >= 0
+            ? Math.floor(post.likes)
+            : Math.floor(Math.random() * 150) + 10;
+
+        const tags = Array.isArray(post?.tags)
+          ? post.tags.filter(
+            (tag: unknown): tag is string =>
+              typeof tag === "string" && tag.trim().length > 0
+          )
+          : [];
+
+        const imageUrl =
+          typeof post?.imageUrl === "string" &&
+            post.imageUrl.trim()
+            ? post.imageUrl
+            : `https://picsum.photos/600/400?random=${Math.floor(
+              Math.random() * 1000
+            )}`;
+
+        const timestamp =
+          typeof post?.timestamp === "number" &&
+            Number.isFinite(post.timestamp)
+            ? post.timestamp
+            : Date.now() -
+            Math.floor(Math.random() * 24 * 60 * 60 * 1000);
+
+        return {
+          id:
+            typeof post?.id === "string" && post.id.trim()
+              ? post.id
+              : `community-${Date.now()}-${index}`,
+
+          user: username,
+
+          location,
+
+          content,
+
+          likes,
+
+          tags: tags.length > 0 ? tags : ["#Travel"],
+
+          imageUrl,
+
+          timestamp
+        };
+      })
+      .filter((post) => post.content.length > 0);
+  };
+
+  // ---------------------------------------------------------
+  // Gemini request with retry
+  // ---------------------------------------------------------
+  const maxRetries = 3;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(
+        `Generating community posts for "${topic}" - attempt ${attempt}/${maxRetries}`
+      );
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3.1-flash-lite",
+
+        contents: prompt,
+
+        config: {
+          responseMimeType: "application/json",
+
+          responseSchema: {
+            type: Type.ARRAY,
+
+            items: {
+              type: Type.OBJECT,
+
+              properties: {
+                id: {
+                  type: Type.STRING
+                },
+
+                user: {
+                  type: Type.STRING
+                },
+
+                location: {
+                  type: Type.STRING
+                },
+
+                content: {
+                  type: Type.STRING
+                },
+
+                likes: {
+                  type: Type.NUMBER
+                },
+
+                tags: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.STRING
+                  }
+                },
+
+                imageUrl: {
+                  type: Type.STRING
+                },
+
+                timestamp: {
+                  type: Type.NUMBER
+                }
+              },
+
+              required: [
+                "id",
+                "user",
+                "location",
+                "content",
+                "likes",
+                "tags",
+                "imageUrl",
+                "timestamp"
+              ]
             }
           }
         }
-      }
-    });
+      });
 
-    return JSON.parse(response.text || '[]');
-  } catch (e) {
-    console.error("Community post generation failed", e);
-    return [];
+      const rawText = response.text?.trim();
+
+      if (!rawText) {
+        throw new Error("Gemini returned an empty response");
+      }
+
+      let parsedData: unknown;
+
+      try {
+        parsedData = JSON.parse(rawText);
+      } catch (parseError) {
+        console.error(
+          "Failed to parse Gemini community response:",
+          parseError
+        );
+
+        throw new Error("Gemini returned invalid JSON");
+      }
+
+      const normalizedPosts = normalizePosts(
+        Array.isArray(parsedData) ? parsedData : []
+      );
+
+      if (normalizedPosts.length > 0) {
+        console.log(
+          `Successfully generated ${normalizedPosts.length} community posts`
+        );
+
+        return normalizedPosts;
+      }
+
+      throw new Error("Gemini returned no valid community posts");
+    } catch (error: any) {
+      const errorMessage =
+        error?.message || String(error);
+
+      console.error(
+        `Community post generation attempt ${attempt} failed:`,
+        error
+      );
+
+      // Check for temporary Gemini availability errors
+      const isTemporaryError =
+        errorMessage.includes("503") ||
+        errorMessage.includes("UNAVAILABLE") ||
+        errorMessage.includes("high demand") ||
+        errorMessage.includes("temporarily") ||
+        errorMessage.includes("overloaded");
+
+      if (!isTemporaryError) {
+        console.error(
+          "Non-retryable Gemini error. Using fallback posts."
+        );
+
+        return createFallbackPosts();
+      }
+
+      // If this was not the last attempt, wait before retrying
+      if (attempt < maxRetries) {
+        const delay = attempt * 2000;
+
+        console.log(
+          `Gemini is temporarily unavailable. Retrying in ${delay / 1000}s...`
+        );
+
+        await new Promise((resolve) =>
+          setTimeout(resolve, delay)
+        );
+      }
+    }
   }
+
+  // ---------------------------------------------------------
+  // Gemini failed after all retries
+  // ---------------------------------------------------------
+  console.warn(
+    `Gemini unavailable after ${maxRetries} attempts. Using fallback community posts.`
+  );
+
+  return createFallbackPosts();
 };
+
+

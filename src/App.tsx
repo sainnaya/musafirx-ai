@@ -94,7 +94,7 @@ export default function App() {
             </div>
 
             {/* Desktop Nav */}
-            <div className="hidden md:flex items-center space-x-1">
+            <div className="hidden lg:flex items-center gap-1 min-w-0">
               <NavItem state={AppState.HOME} icon={Home} label="Home" />
               <NavItem state={AppState.PLANNING} icon={Layout} label="Plan Trip" />
 
@@ -105,7 +105,7 @@ export default function App() {
               <NavItem state={AppState.GUIDES} icon={Globe} label="Guides" />
             </div>
 
-            <div className="hidden md:flex items-center gap-3">
+            <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
               <button
                 onClick={() => setDarkMode(!darkMode)}
                 className="p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-400 transition-colors"
@@ -122,7 +122,7 @@ export default function App() {
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="flex items-center gap-3 md:hidden">
+            <div className="flex items-center gap-3 lg:hidden">
               <button
                 onClick={() => setDarkMode(!darkMode)}
                 className="p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-400 transition-colors"
@@ -141,7 +141,7 @@ export default function App() {
 
         {/* Mobile Nav */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-4 space-y-2 shadow-xl absolute w-full z-40">
+          <div className="lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-4 space-y-2 shadow-xl absolute w-full z-40">
             <NavItem state={AppState.HOME} icon={Home} label="Home" />
             <NavItem state={AppState.PLANNING} icon={Layout} label="Plan Trip" />
             {currentItinerary && <NavItem state={AppState.ITINERARY} icon={Compass} label="My Trip" />}
@@ -155,89 +155,91 @@ export default function App() {
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        {appState === AppState.HOME && (
-          <div className="space-y-12">
-            {!currentItinerary ? (
-              <LandingPage onStart={() => setAppState(AppState.PLANNING)} />
-            ) : (
-              <div className="text-center py-20 animate-fade-in">
-                <div className="inline-flex items-center justify-center p-4 bg-teal-50 dark:bg-teal-900/30 rounded-full mb-6">
-                  <Compass className="w-12 h-12 text-teal-600 dark:text-teal-400" />
+      <main className="flex-1 w-full min-w-0">
+        <div className="w-full max-w-7xl mx-auto min-w-0 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
+          {appState === AppState.HOME && (
+            <div className="space-y-12">
+              {!currentItinerary ? (
+                <LandingPage onStart={() => setAppState(AppState.PLANNING)} />
+              ) : (
+                <div className="text-center py-20 animate-fade-in">
+                  <div className="inline-flex items-center justify-center p-4 bg-teal-50 dark:bg-teal-900/30 rounded-full mb-6">
+                    <Compass className="w-12 h-12 text-teal-600 dark:text-teal-400" />
+                  </div>
+                  <h2 className="text-4xl font-extrabold text-slate-900 dark:text-white mb-4 tracking-tight">Welcome Back!</h2>
+                  <p className="text-lg text-slate-600 dark:text-slate-300 mb-10 max-w-lg mx-auto leading-relaxed">
+                    Your personalized itinerary for <span className="text-teal-600 dark:text-teal-400 font-bold">{currentItinerary.title}</span> is ready.
+                  </p>
+                  <div className="flex flex-col sm:flex-row justify-center gap-4">
+                    <button
+                      onClick={() => setAppState(AppState.ITINERARY)}
+                      className="inline-flex items-center justify-center px-8 py-4 bg-teal-600 text-white rounded-xl font-semibold shadow-lg shadow-teal-500/30 dark:shadow-teal-900/30 hover:bg-teal-700 hover:shadow-teal-500/40 hover:-translate-y-0.5 transition-all duration-300"
+                    >
+                      View Itinerary <ChevronRight className="w-4 h-4 ml-2" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm("Are you sure? This will delete your current itinerary.")) {
+                          setCurrentItinerary(null);
+                          localStorage.removeItem('musafirx_itinerary');
+                          setAppState(AppState.PLANNING); // Go to planning after reset
+                        }
+                      }}
+                      className="inline-flex items-center justify-center px-8 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 transition-all duration-300"
+                    >
+                      Create New Plan
+                    </button>
+                  </div>
                 </div>
-                <h2 className="text-4xl font-extrabold text-slate-900 dark:text-white mb-4 tracking-tight">Welcome Back!</h2>
-                <p className="text-lg text-slate-600 dark:text-slate-300 mb-10 max-w-lg mx-auto leading-relaxed">
-                  Your personalized itinerary for <span className="text-teal-600 dark:text-teal-400 font-bold">{currentItinerary.title}</span> is ready.
-                </p>
-                <div className="flex flex-col sm:flex-row justify-center gap-4">
-                  <button
-                    onClick={() => setAppState(AppState.ITINERARY)}
-                    className="inline-flex items-center justify-center px-8 py-4 bg-teal-600 text-white rounded-xl font-semibold shadow-lg shadow-teal-500/30 dark:shadow-teal-900/30 hover:bg-teal-700 hover:shadow-teal-500/40 hover:-translate-y-0.5 transition-all duration-300"
-                  >
-                    View Itinerary <ChevronRight className="w-4 h-4 ml-2" />
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (confirm("Are you sure? This will delete your current itinerary.")) {
-                        setCurrentItinerary(null);
-                        localStorage.removeItem('musafirx_itinerary');
-                        setAppState(AppState.PLANNING); // Go to planning after reset
-                      }
-                    }}
-                    className="inline-flex items-center justify-center px-8 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 transition-all duration-300"
-                  >
-                    Create New Plan
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {appState === AppState.PLANNING && (
-          <PlannerForm onSubmit={handleItinerarySubmit} isLoading={isLoading} />
-        )}
-
-        {appState === AppState.ITINERARY && currentItinerary && (
-          <ItineraryView itinerary={currentItinerary} />
-        )}
-
-        {appState === AppState.EXPENSES && (
-          <ExpenseDashboard />
-        )}
-
-        {appState === AppState.SOCIAL_STUDIO && (
-          <SocialMediaGenerator itinerary={currentItinerary} />
-        )}
-
-        {appState === AppState.COMMUNITY && (
-          <CommunityHub destination={currentItinerary?.destination} />
-        )}
-
-        {appState === AppState.GUIDES && (
-          <GuideFinder destination={currentItinerary?.destination} />
-        )}
-
-        {appState === AppState.PROFILE && (
-          <UserProfileView />
-        )}
-
-        {/* Fallback for Itinerary state if empty */}
-        {appState === AppState.ITINERARY && !currentItinerary && (
-          <div className="flex flex-col items-center justify-center py-32 text-center animate-fade-in">
-            <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
-              <Compass className="w-10 h-10 text-slate-400" />
+              )}
             </div>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No Plan Yet</h3>
-            <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-sm">You haven't generated a travel plan yet. Head over to the planner to get started.</p>
-            <button
-              onClick={() => setAppState(AppState.PLANNING)}
-              className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-teal-600 dark:text-teal-400 font-semibold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-teal-200 transition-all"
-            >
-              <ArrowLeft className="w-4 h-4" /> Go to Planner
-            </button>
-          </div>
-        )}
+          )}
+
+          {appState === AppState.PLANNING && (
+            <PlannerForm onSubmit={handleItinerarySubmit} isLoading={isLoading} />
+          )}
+
+          {appState === AppState.ITINERARY && currentItinerary && (
+            <ItineraryView itinerary={currentItinerary} />
+          )}
+
+          {appState === AppState.EXPENSES && (
+            <ExpenseDashboard />
+          )}
+
+          {appState === AppState.SOCIAL_STUDIO && (
+            <SocialMediaGenerator itinerary={currentItinerary} />
+          )}
+
+          {appState === AppState.COMMUNITY && (
+            <CommunityHub destination={currentItinerary?.destination} />
+          )}
+
+          {appState === AppState.GUIDES && (
+            <GuideFinder destination={currentItinerary?.destination} />
+          )}
+
+          {appState === AppState.PROFILE && (
+            <UserProfileView />
+          )}
+
+          {/* Fallback for Itinerary state if empty */}
+          {appState === AppState.ITINERARY && !currentItinerary && (
+            <div className="flex flex-col items-center justify-center py-32 text-center animate-fade-in">
+              <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
+                <Compass className="w-10 h-10 text-slate-400" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No Plan Yet</h3>
+              <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-sm">You haven't generated a travel plan yet. Head over to the planner to get started.</p>
+              <button
+                onClick={() => setAppState(AppState.PLANNING)}
+                className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-teal-600 dark:text-teal-400 font-semibold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-teal-200 transition-all"
+              >
+                <ArrowLeft className="w-4 h-4" /> Go to Planner
+              </button>
+            </div>
+          )}
+        </div>
       </main>
 
       {/* Persistent ChatBot - Pass current itinerary for context */}

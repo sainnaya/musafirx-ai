@@ -196,10 +196,11 @@ export const ExpenseDashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className={`bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col justify-between h-40 relative overflow-hidden transition-shadow ${!isBudgetSet ? 'opacity-80' : 'group hover:shadow-md'}`}>
+            <div className={`bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col justify-betweenf min-h-40 relative overflow-hidden transition-shadow ${!isBudgetSet ? 'opacity-80' : 'group hover:shadow-md'}`}>
               {!isBudgetSet && (
                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-[2px]">
                   <div className="bg-white dark:bg-slate-800 p-2 rounded-full shadow-sm mb-2">
+
                     <Lock className="w-5 h-5 text-slate-400 dark:text-slate-500" />
                   </div>
                   <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Locked</span>
@@ -219,7 +220,7 @@ export const ExpenseDashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className={`bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col justify-between h-40 relative overflow-hidden transition-shadow ${!isBudgetSet ? 'opacity-80' : 'group hover:shadow-md'}`}>
+            <div className={`bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col justify-between min-h-40 relative overflow-hidden transition-shadow ${!isBudgetSet ? 'opacity-80' : 'group hover:shadow-md'}`}>
               {!isBudgetSet && (
                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-[2px]">
                   <div className="bg-white dark:bg-slate-800 p-2 rounded-full shadow-sm mb-2">
@@ -340,7 +341,7 @@ export const ExpenseDashboard: React.FC = () => {
       {/* Charts */}
       {expenses.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 h-96">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 min-h-96">
             <h3 className="font-bold text-slate-800 dark:text-white mb-6 text-sm uppercase tracking-wide">Spend Breakdown</h3>
             <ResponsiveContainer width="100%" height="90%">
               <PieChart>
@@ -369,7 +370,7 @@ export const ExpenseDashboard: React.FC = () => {
             </ResponsiveContainer>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 h-96">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 min-h-96">
             <h3 className="font-bold text-slate-800 dark:text-white mb-6 text-sm uppercase tracking-wide">Category Analysis</h3>
             <ResponsiveContainer width="100%" height="90%">
               <BarChart
@@ -401,7 +402,7 @@ export const ExpenseDashboard: React.FC = () => {
 
       {/* Expense List */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
+        <div className="p-4 sm:p-6 border-b border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
           <h3 className="font-bold text-slate-800 dark:text-white">Recent Transactions</h3>
           <button
             onClick={handleExportCSV}

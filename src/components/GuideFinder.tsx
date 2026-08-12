@@ -47,7 +47,7 @@ export const GuideFinder: React.FC<GuideFinderProps> = ({ destination }) => {
   };
 
   return (
-    <div className="animate-fade-in max-w-6xl mx-auto min-h-[600px]">
+    <div className="w-full min-w-0 max-w-6xl mx-auto min-h-[600px] animate-fade-in">
       <div className="mb-12 text-center max-w-2xl mx-auto">
         <span className="text-teal-600 dark:text-teal-400 font-semibold tracking-wide uppercase text-xs bg-teal-50 dark:bg-teal-900/30 px-3 py-1 rounded-full mb-4 inline-block">
           AI-Matched Locals
@@ -90,10 +90,11 @@ export const GuideFinder: React.FC<GuideFinderProps> = ({ destination }) => {
           <p className="text-slate-500">Finding best local experts in {targetLocation}...</p>
         </div>
       ) : guides.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8">
           {guides.map(guide => (
-            <div key={guide.id} className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-              <div className="h-28 bg-gradient-to-r from-slate-800 to-slate-900 relative">
+            <div
+              key={guide.id}
+              className="min-w-0 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">          <div className="h-28 bg-gradient-to-r from-slate-800 to-slate-900 relative">
                 <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '20px 20px' }}></div>
               </div>
               <div className="px-6 relative">
@@ -101,7 +102,7 @@ export const GuideFinder: React.FC<GuideFinderProps> = ({ destination }) => {
                   <img src={guide.imageUrl} alt={guide.name} className="w-24 h-24 rounded-full object-cover border-2 border-white dark:border-slate-700 shadow-md" />
                 </div>
                 <div className="pt-16 pb-6">
-                  <div className="flex justify-between items-start mb-3">
+                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-3">
                     <div>
                       <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                         {guide.name}
@@ -109,7 +110,7 @@ export const GuideFinder: React.FC<GuideFinderProps> = ({ destination }) => {
                       </h3>
                       <p className="text-teal-600 dark:text-teal-400 font-medium text-sm mt-0.5">{guide.specialty}</p>
                     </div>
-                    <div className="text-right bg-slate-50 dark:bg-slate-700/50 px-3 py-1 rounded-lg">
+                    <div className="text-left sm:text-right bg-slate-50 dark:bg-slate-700/50 px-3 py-1 rounded-lg flex-shrink-0">
                       <span className="block text-lg font-bold text-slate-900 dark:text-white">${guide.ratePerHour}</span>
                       <span className="block text-slate-400 dark:text-slate-500 text-xs font-medium uppercase tracking-wider">/ hr</span>
                     </div>
@@ -127,11 +128,12 @@ export const GuideFinder: React.FC<GuideFinderProps> = ({ destination }) => {
                       <div>
                         <p className="font-semibold text-slate-700 dark:text-slate-300 mb-1">Languages</p>
                         <div className="flex flex-wrap gap-1">
-                          {guide.languages.map(lang => (
-                            <span key={lang} className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded">
+                          {(guide.languages ?? []).map((lang, index) => (
+                            <span key={`${lang}-${index}`}>
                               {lang}
                             </span>
                           ))}
+
                         </div>
                       </div>
                     </div>

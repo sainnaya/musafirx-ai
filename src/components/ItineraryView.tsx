@@ -24,9 +24,9 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({ itinerary }) => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in">
+    <div className="w-full min-w-0 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 animate-fade-in">
       {/* Sidebar Navigation */}
-      <div className="lg:col-span-4 xl:col-span-3 space-y-6">
+      <div className="min-w-0 lg:col-span-4 xl:col-span-3 space-y-6">
         <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 sticky top-24">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white leading-tight mb-2">{itinerary.title}</h2>
@@ -102,29 +102,29 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({ itinerary }) => {
       </div>
 
       {/* Main Content / Timeline */}
-      <div className="lg:col-span-8 xl:col-span-9">
+      <div className="min-w-0 lg:col-span-8 xl:col-span-9">
         {(itinerary.days ?? [])
           .filter(d => d.day === activeDay)
           .map(day => (
             <div key={day.day} className="space-y-8">
               {/* Day Header */}
-              <div className="relative rounded-3xl overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none group h-64">
+              <div className="relative rounded-3xl overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none group min-h-56 sm:min-h-64">
                 <div
                   className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                   style={{ backgroundImage: `url(https://picsum.photos/1200/600?random=${day.day + 10})` }}
                 ></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 p-8">
+                <div className="absolute bottom-0 left-0 p-4 sm:p-6 md:p-8">
                   <div className="flex items-center gap-2 text-teal-300 font-bold uppercase tracking-wider text-sm mb-2">
                     <CalendarIcon className="w-4 h-4" />
                     {day.date || `Day ${day.day}`}
                   </div>
-                  <h3 className="text-4xl font-extrabold text-white leading-tight">{day.theme}</h3>
+                  <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white leading-tight break-words"></h3>
                 </div>
               </div>
 
               {/* Timeline */}
-              <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-sm border border-slate-100 dark:border-slate-700">
+              <div className="bg-white dark:bg-slate-800 rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm border border-slate-100 dark:border-slate-700">
                 <div className="space-y-10">
                   {day.activities.map((activity, idx) => (
                     <div key={idx} className="relative pl-10 sm:pl-12 group">
@@ -162,7 +162,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({ itinerary }) => {
                       <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400 pt-1">
                         <div className="flex items-center gap-1.5">
                           <MapPin className="w-4 h-4 text-rose-500" />
-                          <span className="truncate max-w-[180px] font-medium text-slate-600 dark:text-slate-300">{activity.location}</span>
+                          <span className="truncate max-w-[180px] sm:max-w-xs font-medium text-slate-600 dark:text-slate-300"></span>
                         </div>
 
                         <a
